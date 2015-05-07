@@ -1,6 +1,14 @@
 #!/usr/bin/python
 """ Read a VDatum .gtx binary file from http://vdatum.noaa.gov/dev/gtx_info.html and write an ArcIinfoAsciiGrid File
-    for use with GIS systems
+    for use with GIS systems.
+
+    Usage:
+    mygtx2aag.py file.gtx  
+
+    Outputs in working directory:
+    file.asc  # an ArcInfo ASCII Grid file with the contents of file.gtx
+    file.prj  # a projection file for EPSG:4269 (NAD83) from http://spatialreference.org/ref/epsg/4269/ 
+
 """
 import numpy
 import sys
@@ -9,8 +17,7 @@ from struct import unpack
 
 file=sys.argv[1]
 
-outbase=os.path.splitext(file)[0]
-
+outbase=os.path.splitext(os.path.basename(file))[0]  # filename, stripped of path and extension
 
 # Bigendian doubles and ints, per http://vdatum.noaa.gov/dev/gtx_info.html
 
@@ -44,16 +51,16 @@ aagfile.close()
 
 prjfile=open("{f}.prj".format(f=outbase),'w')
 
-prjfile.write("""GEOGCS["WGS 84",
-    DATUM["WGS_1984",
-        SPHEROID["WGS 84",6378137,298.257223563,
-            AUTHORITY["EPSG","7030"]],
-        AUTHORITY["EPSG","6326"]],
+prjfile.write("""GEOGCS["NAD83",
+    DATUM["North_American_Datum_1983",
+        SPHEROID["GRS 1980",6378137,298.257222101,
+            AUTHORITY["EPSG","7019"]],
+        AUTHORITY["EPSG","6269"]],
     PRIMEM["Greenwich",0,
         AUTHORITY["EPSG","8901"]],
     UNIT["degree",0.01745329251994328,
         AUTHORITY["EPSG","9122"]],
-    AUTHORITY["EPSG","4326"]]
+    AUTHORITY["EPSG","4269"]]
 """)
 prjfile.close()
 
