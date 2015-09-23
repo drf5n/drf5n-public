@@ -1,30 +1,36 @@
 #!/usr/bin/python
-""" Read a VDatum .gtx binary file from http://vdatum.noaa.gov/dev/gtx_info.html and write an ArcIinfoAsciiGrid File
-    for use with GIS systems.
-
-    Usage:
-    mygtx2aag.py [-h] [-i]  [-f]  file.gtx  
-
-    Outputs in working directory:
-    file.asc  # an ArcInfo ASCII Grid file with the contents of file.gtx
-    file.prj  # a projection file for EPSG:4269 (NAD83) from http://spatialreference.org/ref/epsg/4269/ 
-
-"""
 import numpy
 import sys
 import os
 import argparse
 from struct import unpack
 
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(description=
+""" Read a VDatum .gtx binary file from http://vdatum.noaa.gov/docs/gtx_info.html and write an ArcIinfoAsciiGrid File
+    for use with GIS systems.
+
+    Outputs in working directory:
+    file.asc  # an ArcInfo ASCII Grid file with the contents of file.gtx
+    file.prj  # a projection file for EPSG:4269 (NAD83) from http://spatialreference.org/ref/epsg/4269/ 
+
+
+    Note that the double format would have a filesize of 40+8*nRows*nCols  
+    while the float and integer formats would have file sizes of 40+4*nRows*nCols.
+
+"""
+
+)
 parser.add_argument("file", help="VDatum gtx format file per http://vdatum.noaa.gov/docs/gtx_info.html")
-parser.add_argument("-i", "--integer", help="Parse data as integers instead of doubles", action="store_true")
+parser.add_argument("-i", "--integer", help="Parse data as integers instead of floats.  Units in mm.", action="store_true")
 parser.add_argument("-f", "--float", help="Parse data as floats instead of doubles", action="store_true")
+parser.add_argument("-d", "--double", help="Parse data as double instead of floats", action="store_true")
 args = parser.parse_args()
 
 file=args.file
 
-data_type='>d'          # big-endian double default
+data_type='>f'          # big-endian float default since 2009
+if args.double:
+	data_type='>d'  # big-endian double
 if args.float:
 	data_type='>i'  # big-endian integer
 if args.integer:
@@ -53,7 +59,7 @@ nodata_value {nodata}
 """.format(nCol=nCol,nRow=nRow,llLon=llLon,llLat=llLat,dx=dLat,nodata=nodata))
 
 npoints=nRow*nCol
-data=numpy.fromfile(f,dtype=data_type,count=nRow*nCol*8)
+data=numpy.fromfile(f,dtype=data_type,count=nRow*nCol)
 print "Data size= {s} vs {n} from ({r} x {c})".format(s=data.size, n=npoints,r=nRow,c=nCol)
 data=data.reshape((nRow,nCol))[::-1]
 data[data==-88.8888]=nodata
