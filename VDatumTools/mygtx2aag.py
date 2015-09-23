@@ -3,7 +3,7 @@
     for use with GIS systems.
 
     Usage:
-    mygtx2aag.py file.gtx  
+    mygtx2aag.py [-h] [-i]  [-f]  file.gtx  
 
     Outputs in working directory:
     file.asc  # an ArcInfo ASCII Grid file with the contents of file.gtx
@@ -13,9 +13,22 @@
 import numpy
 import sys
 import os
+import argparse
 from struct import unpack
 
-file=sys.argv[1]
+parser = argparse.ArgumentParser()
+parser.add_argument("file", help="VDatum gtx format file per http://vdatum.noaa.gov/docs/gtx_info.html")
+parser.add_argument("-i", "--integer", help="Parse data as integers instead of doubles", action="store_true")
+parser.add_argument("-f", "--float", help="Parse data as floats instead of doubles", action="store_true")
+args = parser.parse_args()
+
+file=args.file
+
+data_type='>d'          # big-endian double default
+if args.float:
+	data_type='>i'  # big-endian integer
+if args.integer:
+	data_type='>f'  # big-endian float
 
 outbase=os.path.splitext(os.path.basename(file))[0]  # filename, stripped of path and extension
 
@@ -40,7 +53,9 @@ nodata_value {nodata}
 """.format(nCol=nCol,nRow=nRow,llLon=llLon,llLat=llLat,dx=dLat,nodata=nodata))
 
 npoints=nRow*nCol
-data=numpy.fromfile(f,dtype='>d',count=nRow*nCol*8).reshape((nRow,nCol))[::-1]
+data=numpy.fromfile(f,dtype=data_type,count=nRow*nCol*8)
+print "Data size= {s} vs {n} from ({r} x {c})".format(s=data.size, n=npoints,r=nRow,c=nCol)
+data=data.reshape((nRow,nCol))[::-1]
 data[data==-88.8888]=nodata
 
 for row in numpy.arange(nRow):
