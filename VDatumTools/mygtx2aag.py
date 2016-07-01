@@ -9,6 +9,8 @@ parser = argparse.ArgumentParser(description=
 """ Read a VDatum .gtx binary file from http://vdatum.noaa.gov/docs/gtx_info.html and write an ArcIinfoAsciiGrid File
     for use with GIS systems.
 
+    2016-07-01 - note that ArcInfo and GDAL both support .gtx files directly, obviating the need for this script.
+
     Outputs in working directory:
     file.asc  # an ArcInfo ASCII Grid file with the contents of file.gtx
     file.prj  # a projection file for EPSG:4269 (NAD83) from http://spatialreference.org/ref/epsg/4269/ 
