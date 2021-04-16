@@ -47,7 +47,7 @@ f=open(file,'rb')
 data=f.read(4*8+2*4)
 
 llLat,llLon, dLat,dLon, nRow,nCol=unpack(">ddddii",data)
-llLon=llLon-360.0
+llLon=llLon-360.0 # convert from 0-360 to -180/180
 nodata= -9999
 
 aagfile=open("{f}.asc".format(f=outbase),'w')
