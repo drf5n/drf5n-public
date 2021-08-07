@@ -1,9 +1,11 @@
 #!/usr/bin/env python
+# https://github.com/drf5n/drf5n-public/blob/master/gdalwarp2match.py
+
 
 from osgeo import gdal, gdalconst
 import argparse
 
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(description='Use GDAL to reproject a raster to match the extents and res of a template')
 parser.add_argument("source", help="Source file")
 parser.add_argument("template", help = "template with extents and resolution to match")
 parser.add_argument("destination", help = "destination file (geoTIFF)")
