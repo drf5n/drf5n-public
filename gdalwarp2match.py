@@ -5,10 +5,19 @@
 from osgeo import gdal, gdalconst
 import argparse
 
+# some mappings per https://gdal.org/programs/gdalwarp.html and https://gdal.org/python/osgeo.gdalconst-module.html
+resampling = { 'near': gdalconst.GRA_NearestNeighbour,
+                   'bilinear': gdalconst.GRA_Bilinear,
+                   'cubic': gdalconst.GRA_Cubic,}
+
+
 parser = argparse.ArgumentParser(description='Use GDAL to reproject a raster to match the extents and res of a template')
 parser.add_argument("source", help="Source file")
 parser.add_argument("template", help = "template with extents and resolution to match")
 parser.add_argument("destination", help = "destination file (geoTIFF)")
+parser.add_argument("--resample", choices=resampling.keys(),
+                    help="""Resampling/interpolation method """, default="near")
+
 args = parser.parse_args()
 print(args)
 
@@ -35,12 +44,6 @@ dst.SetGeoTransform( match_geotrans )
 dst.SetProjection( match_proj)
 
 # Do the work
-# GRA_Bilinear Bilinear give diamond-shaped artifacts
-# GRA_CubicSpline Cubic-Spline smooths them
-# GRA_NearestNeighbour nearest neighbor???? 
-interpolation=gdalconst.GRA_NearestNeighbour
-#gdal.ReprojectImage(src, dst, src_proj, match_proj, gdalconst.GRA_Bilinear)
-#gdal.ReprojectImage(src, dst, src_proj, match_proj, gdalconst.GRA_CubicSpline)
-gdal.ReprojectImage(src, dst, src_proj, match_proj, interpolation)
+gdal.ReprojectImage(src, dst, src_proj, match_proj, resampling[args.method])
 
 del dst # Flush
