@@ -44,6 +44,6 @@ dst.SetGeoTransform( match_geotrans )
 dst.SetProjection( match_proj)
 
 # Do the work
-gdal.ReprojectImage(src, dst, src_proj, match_proj, resampling[args.method])
+gdal.ReprojectImage(src, dst, src_proj, match_proj, resampling[args.resample])
 
 del dst # Flush
