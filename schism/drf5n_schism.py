@@ -5,6 +5,7 @@ See https://github.com/drf5n/drf5n-public/schism/drf5n_schism.py
 
 drf5n
 """
+import numpy as np
 
 def schismBaseDate2Datetime64(string="2014 6 7 8.00 9.00"):
     """Convert a Schism time:basedate attribute string into a numpy dateime64 type
@@ -21,6 +22,18 @@ def schismBaseDate2Datetime64(string="2014 6 7 8.00 9.00"):
     import pandas
     [year,month,day, hour, minute] = string.split()
     return(pandas.to_datetime(f"{year}-{month}-{day} {hour}:{minute}Z"))
+
+def near(x, x0, n=1):
+    """
+    Given an 1D array `x` and a scalar `x0`, returns the `n` indices of the
+    element of `x` closest to `x0`.
+    from RPSstuff
+
+    """
+    distance = np.abs(x - x0)
+    index = np.argsort(distance)
+    return index[:n], distance[index[:n]]
+
 
 if __name__ == "__main__":
   print("""Miscellaneous functions for SCHISM
