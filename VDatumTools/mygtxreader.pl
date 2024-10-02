@@ -3,7 +3,7 @@ use strict;
 
 my $usage = <<EOT;
 For unpacking a vdatum GTX file per http://vdatum.noaa.gov/dev/gtx_info.html
-
+drf@vims.edu
 EOT
 
 my $file = $ARGV[0];
